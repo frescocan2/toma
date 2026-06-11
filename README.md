@@ -70,4 +70,4 @@ Datos de películas por [TMDB](https://www.themoviedb.org). Este producto usa la
 
 ---
 
-<p align="center">Hecho con criterio en un solo archivo · <a href="https://github.com/frescocan">@frescocan</a></p>
+<p align="center">Hecho con criterio en un solo archivo · <a href="https://github.com/frescocan2">@frescocan</a></p>
