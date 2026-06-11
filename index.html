@@ -233,7 +233,7 @@
 
   <footer class="foot">
     <span>© 2026 Frescocan</span>
-    <a href="https://github.com/frescocan/toma" target="_blank" rel="noopener" aria-label="Proyecto en GitHub">
+    <a href="https://github.com/frescocan2/toma" target="_blank" rel="noopener" aria-label="Proyecto en GitHub">
       <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
       GitHub
     </a>
@@ -263,8 +263,27 @@ let profile=null, obStep=0, currentRecs=[];
 let mood=null, fmtSel='cualquiera', timeSel='unas dos horas';
 const defaultProfile=()=>({platforms:PLATFORMS.map(p=>p.id),genres:[],loved:[],hated:[],region:'España',lang:'Da igual',history:[],watchlist:[]});
 
-async function loadProfile(){try{const r=await window.storage.get(STORE_KEY);if(r&&r.value)return JSON.parse(r.value);}catch(e){}return null;}
-async function saveProfile(){try{await window.storage.set(STORE_KEY,JSON.stringify(profile));}catch(e){toast('No se guardó');}}
+// Persistencia: localStorage en despliegues reales (GitHub Pages, Netlify…),
+// con fallback a window.storage (entorno de previsualización). Sin red, sin cuentas.
+const store={
+  async get(k){
+    try{const v=localStorage.getItem(k);if(v!==null)return v;}catch(e){}
+    try{if(window.storage){const r=await window.storage.get(k);if(r&&r.value)return r.value;}}catch(e){}
+    return null;
+  },
+  async set(k,v){
+    let ok=false;
+    try{localStorage.setItem(k,v);ok=true;}catch(e){}
+    try{if(window.storage){await window.storage.set(k,v);ok=true;}}catch(e){}
+    return ok;
+  },
+  async del(k){
+    try{localStorage.removeItem(k);}catch(e){}
+    try{if(window.storage)await window.storage.delete(k);}catch(e){}
+  }
+};
+async function loadProfile(){try{const v=await store.get(STORE_KEY);if(v)return JSON.parse(v);}catch(e){}return null;}
+async function saveProfile(){const ok=await store.set(STORE_KEY,JSON.stringify(profile));if(!ok)toast('No se guardó');}
 
 const $=s=>document.querySelector(s);
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),1700);}
@@ -566,7 +585,7 @@ function renderProfileTab(){
   renderPills($('#pf-region'),REGIONS,[profile.region],async id=>{profile.region=id;shown.clear();await saveProfile();renderProfileTab();});
   renderPills($('#pf-lang'),LANGS,[profile.lang],async id=>{profile.lang=id;await saveProfile();renderProfileTab();});
 }
-async function resetAll(){if(!confirm('¿Restablecer perfil, historial y lista?'))return;try{await window.storage.delete(STORE_KEY);}catch(e){}location.reload();}
+async function resetAll(){if(!confirm('¿Restablecer perfil, historial y lista?'))return;await store.del(STORE_KEY);location.reload();}
 
 function goTab(name,btn,push=true){
   if(!btn)btn=document.querySelector('nav.tabs button[data-tab="'+name+'"]');
