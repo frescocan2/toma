@@ -1,0 +1,18 @@
+TOMA — Puesta en marcha (sin pagos, sin servidor)
+
+1) CLAVE GRATIS DE TMDB (2 min)
+   - Entra en https://www.themoviedb.org y crea una cuenta.
+   - Ajustes → API → solicita una clave (uso personal). Es gratis.
+   - Copia la "API Key (v3 auth)".
+
+2) PEGA LA CLAVE EN EL ARCHIVO
+   - Abre index.html con cualquier editor de texto.
+   - Busca la línea:   const TMDB_KEY='PON_AQUI_TU_CLAVE_TMDB';
+   - Sustituye PON_AQUI_TU_CLAVE_TMDB por tu clave. Guarda.
+
+3) PUBLICA (elige uno)
+   - GitHub Pages: sube index.html a un repo → Settings → Pages → main / root.
+   - O Netlify/Vercel: arrastra la carpeta. No hace falta nada más.
+   - O en el móvil: ábrelo en Safari → Compartir → Añadir a inicio.
+
+Ya está. Los datos (títulos, plataformas, duración) son reales de TMDB.
